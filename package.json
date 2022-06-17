@@ -1,0 +1,25 @@
+{
+  "name": "new3s-ui",
+  "private": false,
+  "version": "0.0.0",
+  "main": "dist/new-3s.es.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "build:lib": "vue-tsc --noEmit && vite build --config ./scripts/lib.config.ts",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.3",
+    "less": "^4.1.3",
+    "typescript": "^4.5.4",
+    "vite": "^2.9.9",
+    "vite-plugin-dts": "^1.2.0",
+    "vite-plugin-md": "^0.14.1",
+    "vue-tsc": "^0.34.7"
+  }
+}
