@@ -5,6 +5,7 @@
         v-for="(link, index) in data.links"
         :key="index"
         :to="link.path"
+        :style="{ display: 'block' }"
         >{{ link.name }}</router-link
       >
     </aside>
@@ -31,6 +32,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+  background: #f2f4fa;
 }
 .my-kit-doc {
   display: flex;

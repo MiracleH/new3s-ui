@@ -1,14 +1,29 @@
 <template>
-  <div class="circle-water">
-    <div class="circle-water-per">{{ props.perNumber + "%" }}</div>
+  <div
+    class="circle-water"
+    :style="{ width: `${props.size + 18}px`, height: `${props.size + 18}px` }"
+  >
+    <div
+      class="circle-water-per"
+      :style="{
+        top: `${props.size / 2 - 8}px`,
+        fontSize: `${props.size > 100 ? '18px' : '14px'}`,
+      }"
+    >
+      {{ props.perNumber + "%" }}
+    </div>
     <div class="circle-water-num">{{ props.textNumber }}</div>
     <div></div>
-    <canvas :id="'circle-water' + props.id"></canvas>
+    <canvas
+      :id="'circle-water' + props.id"
+      :width="props.size"
+      :height="props.size"
+    ></canvas>
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted } from "vue";
+import { onMounted } from "vue";
 const props = defineProps({
   perNumber: {
     type: Number,
@@ -33,6 +48,10 @@ const props = defineProps({
   wave: {
     type: Number,
     default: 20,
+  },
+  size: {
+    type: Number,
+    default: 58,
   },
 });
 
@@ -151,10 +170,5 @@ onMounted(() => {
     top: 46px;
     color: #fff;
   }
-}
-
-canvas {
-  width: 58px;
-  height: 58px;
 }
 </style>

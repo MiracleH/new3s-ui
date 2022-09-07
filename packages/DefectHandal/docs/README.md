@@ -1,6 +1,6 @@
-<ns-circle-water :size="88"></ns-circle-water>
+<ns-defect-handal></ns-defect-handal>
 
-# 波纹圆球组件
+# 操作缺陷组件
 
 ## 属性
 
@@ -12,4 +12,3 @@
 |  `distance`  |    距离    | number |   -    | `100`  |    否    |
 |   `speed`    |  波动速度  | number |   -    |  `2`   |    否    |
 |    `wave`    |   浪幅度   | number |   -    |  `20`  |    否    |
-|    `size`    |   大小   | number |   -    |  `56`  |    否    |
