@@ -87,6 +87,7 @@
         &-cont {
             width: 100%;
             height: calc(100% - 36px);
+            position: relative;
             &-one {
                 display: inline-block;
                 height: 100%;
@@ -96,6 +97,62 @@
                 width: 49.9%;
                 height: 100%;
                 border-left: 1px solid rgba(0, 0, 0, 0.05);
+            }
+            &-save {
+                position: absolute;
+                padding: 2px 15px;
+                background: #FFFFFF;
+                box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1);
+                border-radius: 2px;
+                font-size: 14px;
+                &-arrow {
+                    top: 35%;
+                    transform: rotate(45deg);
+                    position: absolute;
+                    display: block;
+                    width: 13.07106781px;
+                    height: 13.07106781px;
+                    overflow: hidden;
+                    background: transparent;
+                    pointer-events: none;
+                    left: -5.07106781px;
+                    background: #FFFFFF;
+                    text-align: center;
+                }
+                &-btn {
+                    color: #fff;
+                    border-color: rgba(51, 119, 255, 1);
+                    background: rgba(51, 119, 255, 1);
+                    text-shadow: 0 -1px 0 rgb(0 0 0 / 12%);
+                    box-shadow: 0 2px #0000000b;
+                    display: inline-block;
+                    font-weight: 400;
+                    border: 1px solid transparent;
+                    user-select: none;
+                    touch-action: manipulation;
+                    border-radius: 2px;
+                    padding: 0 5px;
+                }
+            }
+            &-select {
+                top: 20px;
+                left: 300px;
+                position: absolute;
+                background: #FFFFFF;
+                max-height: 150px;
+                font-size: 13px;
+                text-align: center;
+                overflow-y: auto;
+                &-option {
+                    padding: 5px;
+                    background-color: #FFFFFF;
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                    cursor: pointer;
+                    &:hover {
+                        background-color: rgb(51, 119, 255);
+                        color: #fff !important
+                    }
+                }
             }
         }
     }

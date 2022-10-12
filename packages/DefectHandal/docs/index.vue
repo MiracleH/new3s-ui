@@ -3,9 +3,12 @@
     :defectInfoList="defectInfoList"
     :defectTypeList="defectTypeList"
     :defectImageInfo="defectImageInfo"
+    :defectDetailList="defectDetailList"
+    :defectHighLight="defectHighLight"
     @delete="deleteH"
     @add="addH"
     @edit="editH"
+    @detail="detailH"
   ></ns-defect-handal>
 </template>
 
@@ -17,8 +20,8 @@ const defectTypeList = [
     searchValue: null,
     createBy: "admin",
     createTime: "2022-08-23 15:49:26",
-    updateBy: "",
-    updateTime: null,
+    updateBy: "admin",
+    updateTime: "2022-09-14 15:15:02",
     remark: "",
     params: {},
     defectId: 16,
@@ -36,18 +39,18 @@ const defectTypeList = [
     searchValue: null,
     createBy: "admin",
     createTime: "2022-08-29 10:46:53",
-    updateBy: "",
-    updateTime: null,
+    updateBy: "admin",
+    updateTime: "2022-09-14 15:14:53",
     remark: "",
     params: {},
     defectId: 18,
     parentId: 11,
     defectType: "热斑",
     defectDes: "聚集性热斑",
-    defectLevel: "1",
-    markColor: "rgb(2, 150, 136)",
+    defectLevel: "2",
+    markColor: "rgb(31, 135, 232)",
     processOpinion: "",
-    editHotkey: "Q",
+    editHotkey: "q",
     keyCode: "81",
     defectStyle: "P",
   },
@@ -55,8 +58,8 @@ const defectTypeList = [
     searchValue: null,
     createBy: "admin",
     createTime: "2022-08-29 10:47:27",
-    updateBy: "",
-    updateTime: null,
+    updateBy: "admin",
+    updateTime: "2022-09-14 15:14:45",
     remark: "",
     params: {},
     defectId: 19,
@@ -64,7 +67,7 @@ const defectTypeList = [
     defectType: "组件本体",
     defectDes: "组件碎裂",
     defectLevel: "1",
-    markColor: "rgb(66, 165, 246)",
+    markColor: "rgb(255, 183, 78)",
     processOpinion: "",
     editHotkey: "W",
     keyCode: "",
@@ -74,16 +77,16 @@ const defectTypeList = [
     searchValue: null,
     createBy: "admin",
     createTime: "2022-08-29 10:47:56",
-    updateBy: "",
-    updateTime: null,
+    updateBy: "admin",
+    updateTime: "2022-09-14 15:14:37",
     remark: "",
     params: {},
     defectId: 20,
     parentId: 12,
     defectType: "组件本体",
     defectDes: "组件功率低",
-    defectLevel: "1",
-    markColor: "rgb(128, 203, 196)",
+    defectLevel: "2",
+    markColor: "rgb(38, 165, 154)",
     processOpinion: "",
     editHotkey: "E",
     keyCode: "",
@@ -93,16 +96,16 @@ const defectTypeList = [
     searchValue: null,
     createBy: "admin",
     createTime: "2022-08-29 10:48:12",
-    updateBy: "",
-    updateTime: null,
+    updateBy: "admin",
+    updateTime: "2022-09-14 15:14:29",
     remark: "",
     params: {},
     defectId: 21,
     parentId: 12,
     defectType: "组件本体",
     defectDes: "组件连接缺失",
-    defectLevel: "1",
-    markColor: "rgb(165, 214, 167)",
+    defectLevel: "3",
+    markColor: "rgb(216, 27, 67)",
     processOpinion: "",
     editHotkey: "R",
     keyCode: "",
@@ -112,16 +115,16 @@ const defectTypeList = [
     searchValue: null,
     createBy: "admin",
     createTime: "2022-08-29 10:48:43",
-    updateBy: "",
-    updateTime: null,
+    updateBy: "admin",
+    updateTime: "2022-09-14 15:14:22",
     remark: "",
     params: {},
     defectId: 22,
     parentId: 12,
     defectType: "组件本体",
     defectDes: "组串开路",
-    defectLevel: "1",
-    markColor: "rgb(131, 198, 131)",
+    defectLevel: "3",
+    markColor: "rgb(235, 29, 78)",
     processOpinion: "",
     editHotkey: "T",
     keyCode: "",
@@ -131,16 +134,16 @@ const defectTypeList = [
     searchValue: null,
     createBy: "admin",
     createTime: "2022-08-29 10:49:01",
-    updateBy: "",
-    updateTime: null,
+    updateBy: "admin",
+    updateTime: "2022-09-14 15:14:15",
     remark: "",
     params: {},
     defectId: 23,
     parentId: 12,
     defectType: "组件本体",
     defectDes: "短路识别",
-    defectLevel: "1",
-    markColor: "rgb(200, 230, 202)",
+    defectLevel: "4",
+    markColor: "rgb(230, 74, 25)",
     processOpinion: "",
     editHotkey: "Y",
     keyCode: "",
@@ -150,16 +153,16 @@ const defectTypeList = [
     searchValue: null,
     createBy: "admin",
     createTime: "2022-08-29 10:49:18",
-    updateBy: "",
-    updateTime: null,
+    updateBy: "admin",
+    updateTime: "2022-09-14 15:14:04",
     remark: "",
     params: {},
     defectId: 24,
     parentId: 12,
     defectType: "组件本体",
     defectDes: "空载",
-    defectLevel: "1",
-    markColor: "rgb(144, 202, 248)",
+    defectLevel: "4",
+    markColor: "rgb(216, 27, 67)",
     processOpinion: "",
     editHotkey: "U",
     keyCode: "",
@@ -167,30 +170,25 @@ const defectTypeList = [
   },
 ];
 const defectInfoList = ref<any>();
+const defectDetailList = [
+  {
+    label: "故障定位:",
+    value: "123.32132333, 321.32222222",
+  },
+  {
+    label: "位置描述:",
+    value: "1232132132",
+  },
+  {
+    label: "缺陷种类:",
+    value: 12,
+  },
+];
+const defectHighLight = null;
 setTimeout(() => {
   defectInfoList.value = [
     {
-      defectId: 1,
-      defectTypeId: 16,
-      defectName: null,
-      defectColor: "rgb(230, 74, 25)",
-      editHotkey: null,
-      defectType: "热斑",
-      defectDes: "普通热斑",
-      defectBox: '{"x":100,"y":120,"w":150,"h":60}',
-    },
-    {
-      defectId: 2,
-      defectTypeId: 18,
-      defectName: null,
-      defectColor: "rgb(2, 150, 136)",
-      editHotkey: null,
-      defectType: "热斑",
-      defectDes: "聚集性热斑",
-      defectBox: '{"x":220,"y":120,"w":150,"h":60}',
-    },
-    {
-      defectId: 12,
+      defectId: 31,
       defectTypeId: 16,
       defectName: null,
       defectColor: "rgb(230, 74, 25)",
@@ -198,7 +196,66 @@ setTimeout(() => {
       defectType: "热斑",
       defectDes: "普通热斑",
       defectBox:
-        '{"w":19.857464618280837,"h":12.868524557098196,"x":24.60550643762396,"y":46.9380441725216}',
+        '{"w":192.2248243559719,"h":252.9274004683842,"x":1483.9408665105384,"y":1175.1007025761123}',
+      longitude: "116.75418033333334",
+      latitude: "43.08216977777778",
+      locationDesc: null,
+    },
+    {
+      defectId: 34,
+      defectTypeId: 18,
+      defectName: null,
+      defectColor: "rgb(31, 135, 232)",
+      editHotkey: null,
+      defectType: "热斑",
+      defectDes: "聚集性热斑",
+      defectBox:
+        '{"w":672.7868852459017,"h":419.8594847775175,"x":629.0462529274002,"y":638.8946135831383}',
+      longitude: "116.75392316666667",
+      latitude: "43.082314333333336",
+      locationDesc: null,
+    },
+    {
+      defectId: 35,
+      defectTypeId: 20,
+      defectName: null,
+      defectColor: "rgb(38, 165, 154)",
+      editHotkey: null,
+      defectType: "组件本体",
+      defectDes: "组件功率低",
+      defectBox:
+        '{"w":515.9718969555036,"h":435.0351288056206,"x":2308.4841920374706,"y":896.88056206089}',
+      longitude: "116.75453683333333",
+      latitude: "43.08231355555556",
+      locationDesc: null,
+    },
+    {
+      defectId: 36,
+      defectTypeId: 20,
+      defectName: null,
+      defectColor: "rgb(38, 165, 154)",
+      editHotkey: null,
+      defectType: "组件本体",
+      defectDes: "组件功率低",
+      defectBox:
+        '{"w":515.9718969555036,"h":435.0351288056206,"x":2308.4841920374706,"y":896.88056206089}',
+      longitude: "116.75590458333333",
+      latitude: "43.082314027777784",
+      locationDesc: null,
+    },
+    {
+      defectId: 37,
+      defectTypeId: 16,
+      defectName: null,
+      defectColor: "rgb(230, 74, 25)",
+      editHotkey: null,
+      defectType: "热斑",
+      defectDes: "普通热斑",
+      defectBox:
+        '{"w":718.3138173302108,"h":738.5480093676815,"x":1782.3951990632318,"y":735.0070257611242}',
+      longitude: "116.75711225",
+      latitude: "43.08231441666667",
+      locationDesc: null,
     },
   ];
 }, 1000);
@@ -214,13 +271,19 @@ const editH = (value: any) => {
   console.log(value);
 };
 
+const detailH = (value: number) => {
+  console.log(value);
+};
+
 const defectImageInfo = reactive({
   imageUrl: "",
   infraredImageUrl: "",
 });
 onMounted(() => {
   defectImageInfo.imageUrl =
-    "https://uploadfile.huiyi8.com/2014/0517/20140517044630954.jpg";
+    "http://192.168.5.188:9000/pvinspection/20220920_1663668378_587.JPG";
+  defectImageInfo.infraredImageUrl =
+    "http://192.168.5.188:9000/pvinspection/20220920_1663668380_184.JPG";
 });
 </script>
 <style lang="less" scoped></style>

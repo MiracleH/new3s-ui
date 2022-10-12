@@ -49,6 +49,7 @@ export const defectProps = () => ({
   defectDetailList: Array<IDefectDetail>,
   defectInfoList: Array<IDefectInfo>,
   defectImageInfo: Object as PropType<IDefectImageInfo>,
+  defectHighLight: Number,
 });
 const DefectHandal = defineComponent({
   name: "DefectHandal",
@@ -84,6 +85,9 @@ const DefectHandal = defineComponent({
         defectTypeId.value = props.defectTypeList?.map((item) => {
           return item.defectId;
         })[0];
+      }
+      if (toolState.layer === EToolLayer.DOUBLE && state === "DRAG") {
+        dragCallBack();
       }
       cancleHandle();
     };
@@ -161,15 +165,22 @@ const DefectHandal = defineComponent({
     const resetImage = () => {
       imageSingle.value.src = props.defectImageInfo?.imageUrl as string;
       imageSingle.value.onload = () => {
+        imageSingleRef.value.getNode().image(imageSingle.value);
         const handleContSingleWidth = document.querySelector(
           ".defect-handle-cont-one"
         )?.clientWidth as number;
         const handleContSingleHeight = document.querySelector(
           ".defect-handle-cont-one"
         )?.clientHeight as number;
-        configSingleGroup.scaleX =
-          handleContSingleWidth / imageSingle.value.width - 0.05;
-        configSingleGroup.scaleY = configSingleGroup.scaleX;
+
+        configSingleGroup.scaleY =
+          handleContSingleHeight / imageSingle.value.height - 0.01;
+        configSingleGroup.scaleX = configSingleGroup.scaleY;
+        if (toolState.layer === EToolLayer.DOUBLE) {
+          configSingleGroup.scaleX =
+            handleContSingleWidth / imageSingle.value.width - 0.004;
+          configSingleGroup.scaleY = configSingleGroup.scaleX;
+        }
         groupSingleRef.value.getNode().scaleX(configSingleGroup.scaleX);
         groupSingleRef.value.getNode().scaleY(configSingleGroup.scaleX);
         groupSingleRef.value
@@ -186,12 +197,19 @@ const DefectHandal = defineComponent({
               imageSingle.value.height * configSingleGroup.scaleY) /
               2
           );
+        if (
+          toolState.layer === EToolLayer.DOUBLE &&
+          toolState.image === EToolImage.DRAG
+        ) {
+          dragCallBack();
+        }
         adaptationImages();
       };
       if (toolState.layer === EToolLayer.DOUBLE) {
         imageDouble.value.src = props.defectImageInfo
           ?.infraredImageUrl as string;
         imageDouble.value.onload = () => {
+          imageDoubleRef.value.getNode().image(imageDouble.value);
           const handleContDoubleWidth = document.querySelector(
             ".defect-handle-cont-two"
           )?.clientWidth as number;
@@ -199,7 +217,7 @@ const DefectHandal = defineComponent({
             ".defect-handle-cont-two"
           )?.clientHeight as number;
           configDoubleGroup.scaleX =
-            handleContDoubleWidth / imageDouble.value.width - 0.01;
+            handleContDoubleWidth / (imageDouble.value.width * 1.04) - 0.05;
           configDoubleGroup.scaleY = configDoubleGroup.scaleX;
           groupDoubleRef.value.getNode().scaleX(configDoubleGroup.scaleX);
           groupDoubleRef.value.getNode().scaleY(configDoubleGroup.scaleX);
@@ -224,6 +242,18 @@ const DefectHandal = defineComponent({
 
     const changeDefectType = (item: IDefectType) => {
       defectTypeId.value = item.defectId;
+      selectState.selectStatus = false;
+    };
+
+    const dragCallBack = () => {
+      groupSingleRef.value.getNode().dragBoundFunc((pos: any) => {
+        groupDoubleRef.value.getNode().x(pos.x);
+        groupDoubleRef.value.getNode().y(pos.y);
+        return {
+          x: pos.x,
+          y: pos.y,
+        };
+      });
     };
 
     // handal
@@ -233,7 +263,7 @@ const DefectHandal = defineComponent({
       x: number;
       y: number;
       color: string;
-      id: number | undefined;
+      id: number | undefined | string;
       name: string;
       defectType: number;
     }
@@ -247,12 +277,34 @@ const DefectHandal = defineComponent({
       positionX: number;
       positionY: number;
       tipStatus: boolean;
-      tipInfo: JSX.Element | string;
+      tipInfo: string;
     }>({
       positionX: 0,
       positionY: 0,
       tipStatus: false,
       tipInfo: "",
+    });
+
+    const saveState = reactive<{
+      positionX: number;
+      positionY: number;
+      saveStatus: boolean;
+      saveInfo: JSX.Element | null;
+    }>({
+      positionX: 0,
+      positionY: 0,
+      saveStatus: false,
+      saveInfo: null,
+    });
+
+    const selectState = reactive<{
+      positionX: number;
+      positionY: number;
+      selectStatus: boolean;
+    }>({
+      positionX: 0,
+      positionY: 0,
+      selectStatus: false,
     });
 
     const handalWidth = computed(() => {
@@ -272,11 +324,13 @@ const DefectHandal = defineComponent({
     const stageSingleRef = ref();
     const layerSingleRef = ref();
     const groupSingleRef = ref();
+    const imageSingleRef = ref();
     const imageSingle = ref(new window.Image());
     const transformerRef = ref();
     const stageDoubleRef = ref();
     const layerDoubleRef = ref();
     const groupDoubleRef = ref();
+    const imageDoubleRef = ref();
     const imageDouble = ref(new window.Image());
 
     const configSingleGroup = reactive({
@@ -312,7 +366,7 @@ const DefectHandal = defineComponent({
     const drawStatus = ref<boolean>(false);
     const configTransformer = reactive<{
       selectedNode: any;
-      selectedDefectId: number | undefined;
+      selectedDefectId: number | undefined | string;
     }>({
       selectedNode: null,
       selectedDefectId: undefined,
@@ -373,6 +427,17 @@ const DefectHandal = defineComponent({
         configSingleGroup.scaleY =
           configSingleGroup.scaleY / scaleSingleConfig.scaleBy;
       }
+      if (e.evt.deltaY < 0) {
+        configDoubleGroup.scaleX =
+          configDoubleGroup.scaleX * scaleDoubleConfig.scaleBy;
+        configDoubleGroup.scaleY =
+          configDoubleGroup.scaleY * scaleDoubleConfig.scaleBy;
+      } else {
+        configDoubleGroup.scaleX =
+          configDoubleGroup.scaleX / scaleDoubleConfig.scaleBy;
+        configDoubleGroup.scaleY =
+          configDoubleGroup.scaleY / scaleDoubleConfig.scaleBy;
+      }
       adaptationImages();
     };
 
@@ -388,6 +453,17 @@ const DefectHandal = defineComponent({
         configDoubleGroup.scaleY =
           configDoubleGroup.scaleY / scaleDoubleConfig.scaleBy;
       }
+      if (e.evt.deltaY < 0) {
+        configSingleGroup.scaleX =
+          configSingleGroup.scaleX * scaleSingleConfig.scaleBy;
+        configSingleGroup.scaleY =
+          configSingleGroup.scaleY * scaleSingleConfig.scaleBy;
+      } else {
+        configSingleGroup.scaleX =
+          configSingleGroup.scaleX / scaleSingleConfig.scaleBy;
+        configSingleGroup.scaleY =
+          configSingleGroup.scaleY / scaleSingleConfig.scaleBy;
+      }
       adaptationImages();
     };
 
@@ -397,6 +473,7 @@ const DefectHandal = defineComponent({
         transformerNode.nodes([configTransformer.selectedNode]);
       } else {
         transformerNode.nodes([]);
+        saveState.saveStatus = false;
       }
     };
 
@@ -415,45 +492,67 @@ const DefectHandal = defineComponent({
         });
         defectTypeId.value = editInfo?.defectType;
         e.target.moveToTop();
-      } else {
+      } else if (
+        toolState.image === EToolImage.CHOOSE &&
+        e.target.textArr &&
+        configTransformer.selectedNode
+      ) {
+        const point = stageSingleRef.value.getNode().getPointerPosition();
+        selectState.positionX = point.x;
+        selectState.positionY = point.y;
+        selectState.selectStatus = true;
+      }
+      if (
+        toolState.image === EToolImage.CHOOSE &&
+        !e.target.attrs.id &&
+        !e.target.textArr
+      ) {
         configTransformer.selectedNode = null;
         configTransformer.selectedDefectId = undefined;
       }
       updateTransformer();
       if (toolState.image === EToolImage.HANDAL) {
-        configTransformer.selectedDefectId = undefined;
-        configTransformer.selectedNode = null;
-        updateTransformer();
-        drawStatus.value = true;
-        if (
-          props.defectInfoList &&
-          props.defectInfoList.length < defectSingleRecs.value.length
-        ) {
-          defectSingleRecs.value.pop();
+        if (!e.target.textArr) {
+          selectState.selectStatus = false;
+          configTransformer.selectedDefectId = undefined;
+          configTransformer.selectedNode = null;
+          updateTransformer();
+          drawStatus.value = true;
+          if (
+            props.defectInfoList &&
+            props.defectInfoList.length < defectSingleRecs.value.length
+          ) {
+            defectSingleRecs.value.pop();
+          }
+          const pos = stageSingleRef.value.getNode().getPointerPosition();
+          const groupX = groupSingleRef.value.getNode().attrs.x;
+          const groupY = groupSingleRef.value.getNode().attrs.y;
+          drawline.value = [{ points: [pos.x, pos.y] }];
+          defectSingleRecs.value.push({
+            width: 0,
+            height: 0,
+            x:
+              pos.x / configSingleGroup.scaleX -
+              groupX / configSingleGroup.scaleX,
+            y:
+              pos.y / configSingleGroup.scaleY -
+              groupY / configSingleGroup.scaleY,
+            color: props.defectTypeList?.find(
+              (ele) => ele.defectId === defectTypeId.value
+            )?.markColor as string,
+            name: props.defectTypeList?.find(
+              (ele) => ele.defectId === defectTypeId.value
+            )?.defectDes as string,
+            id: "new",
+            defectType: defectTypeId.value as number,
+          });
+          adaptationImages();
+        } else if (configTransformer.selectedNode) {
+          const point = stageSingleRef.value.getNode().getPointerPosition();
+          selectState.positionX = point.x;
+          selectState.positionY = point.y;
+          selectState.selectStatus = true;
         }
-        const pos = stageSingleRef.value.getNode().getPointerPosition();
-        const groupX = groupSingleRef.value.getNode().attrs.x;
-        const groupY = groupSingleRef.value.getNode().attrs.y;
-        drawline.value = [{ points: [pos.x, pos.y] }];
-        defectSingleRecs.value.push({
-          width: 0,
-          height: 0,
-          x:
-            pos.x / configSingleGroup.scaleX -
-            groupX / configSingleGroup.scaleX,
-          y:
-            pos.y / configSingleGroup.scaleY -
-            groupY / configSingleGroup.scaleY,
-          color: props.defectTypeList?.find(
-            (ele) => ele.defectId === defectTypeId.value
-          )?.markColor as string,
-          name: props.defectTypeList?.find(
-            (ele) => ele.defectId === defectTypeId.value
-          )?.defectDes as string,
-          id: undefined,
-          defectType: defectTypeId.value as number,
-        });
-        adaptationImages();
       }
       if (toolState.image === EToolImage.ZOOM) {
         configSingleGroup.scaleX =
@@ -479,25 +578,13 @@ const DefectHandal = defineComponent({
       if (toolState.image === EToolImage.CHOOSE) {
         if (configTransformer.selectedDefectId) {
           const point = stageSingleRef.value.getNode().getPointerPosition();
-          const groupX = groupSingleRef.value.getNode().attrs.x;
-          const groupY = groupSingleRef.value.getNode().attrs.y;
-          defectSingleRecs.value.forEach((item) => {
-            if (item.id === configTransformer.selectedDefectId) {
-              item.x =
-                transformerRef.value.getNode().x() / configSingleGroup.scaleX -
-                groupX;
-              item.y =
-                transformerRef.value.getNode().y() / configSingleGroup.scaleY -
-                groupY;
-            }
-          });
-          tipState.tipInfo = (
+          saveState.saveInfo = (
             <div>
-              <button class="defect-tip-btn" onClick={okHandle}>
+              <button class="defect-handle-cont-save-btn" onClick={okHandle}>
                 确定
               </button>
               <button
-                class="defect-tip-btn"
+                class="defect-handle-cont-save-btn"
                 style={{ marginLeft: "5px" }}
                 onClick={cancleHandle}
               >
@@ -505,31 +592,27 @@ const DefectHandal = defineComponent({
               </button>
             </div>
           );
-          tipState.positionX =
-            e.target.attrs.x +
-            e.target.attrs.width +
-            document
-              .querySelector(".defect-handle-cont-one")
-              ?.getBoundingClientRect().left +
-            10;
-          tipState.positionY =
-            e.target.attrs.y +
-            e.target.attrs.height +
-            document
-              .querySelector(".defect-handle-cont-one")
-              ?.getBoundingClientRect().top -
-            32;
-          tipState.tipStatus = true;
+          saveState.positionX = point.x;
+          saveState.positionY = point.y;
+          saveState.saveStatus = true;
         }
       }
-      if (toolState.image === EToolImage.HANDAL) {
-        tipState.tipInfo = (
+      if (toolState.image === EToolImage.HANDAL && !e.target.textArr) {
+        groupSingleRef.value.getNode().children.forEach((item: any) => {
+          if (item.attrs.id === "new") {
+            configTransformer.selectedNode = item.children[1];
+            configTransformer.selectedDefectId = "new";
+            updateTransformer();
+          }
+        });
+        const point = stageSingleRef.value.getNode().getPointerPosition();
+        saveState.saveInfo = (
           <div>
-            <button class="defect-tip-btn" onClick={okHandle}>
+            <button class="defect-handle-cont-save-btn" onClick={okHandle}>
               确定
             </button>
             <button
-              class="defect-tip-btn"
+              class="defect-handle-cont-save-btn"
               style={{ marginLeft: "5px" }}
               onClick={cancleHandle}
             >
@@ -537,9 +620,12 @@ const DefectHandal = defineComponent({
             </button>
           </div>
         );
-        tipState.positionX = e.evt.clientX + 10;
-        tipState.positionY = e.evt.clientY - 32;
-        tipState.tipStatus = true;
+        saveState.positionX = point.x + 10;
+        saveState.positionY = point.y - 32;
+        saveState.saveStatus = true;
+      }
+      if (e.target.attrs.id && e.target.attrs.id !== "new") {
+        emit("detail", e.target.attrs.id);
       }
       drawStatus.value = false;
     };
@@ -612,12 +698,20 @@ const DefectHandal = defineComponent({
           defectSingleRecs.value[defectSingleRecs.value.length - 1];
         emit("add", addInfo);
       }
-      tipState.tipStatus = false;
+      configTransformer.selectedNode = null;
+      configTransformer.selectedDefectId = undefined;
+      updateTransformer();
+      saveState.saveStatus = false;
+      selectState.selectStatus = false;
     };
 
     const cancleHandle = () => {
       initDefectInfo();
-      tipState.tipStatus = false;
+      configTransformer.selectedNode = null;
+      configTransformer.selectedDefectId = undefined;
+      updateTransformer();
+      saveState.saveStatus = false;
+      selectState.selectStatus = false;
     };
 
     // list
@@ -643,6 +737,22 @@ const DefectHandal = defineComponent({
         if (
           toolState.image === EToolImage.CHOOSE &&
           configTransformer.selectedDefectId
+        ) {
+          defectSingleRecs.value = defectSingleRecs.value?.map((item) => {
+            if (item.id === configTransformer.selectedDefectId) {
+              return {
+                ...item,
+                color: toolState.handalColor,
+                defectType: info?.defectId as number,
+                name: info?.defectDes as string,
+              };
+            }
+            return item;
+          });
+        }
+        if (
+          toolState.image === EToolImage.HANDAL &&
+          configTransformer.selectedDefectId === "new"
         ) {
           defectSingleRecs.value = defectSingleRecs.value?.map((item) => {
             if (item.id === configTransformer.selectedDefectId) {
@@ -753,7 +863,6 @@ const DefectHandal = defineComponent({
       resetLayer();
       resetImage();
     });
-
     return () => (
       <div class="defect">
         {handalState.typeStates ? (
@@ -766,7 +875,15 @@ const DefectHandal = defineComponent({
                   key={index}
                   onClick={changeDefectType.bind(this, item)}
                 >
-                  <div class="defect-type-item-left">
+                  <div
+                    class="defect-type-item-left"
+                    style={{
+                      color:
+                        defectTypeId.value === item.defectId
+                          ? "rgb(51, 119, 255)"
+                          : "",
+                    }}
+                  >
                     <font-awesome-icon
                       icon={["fas", "vector-square"]}
                       style={{ fontSize: "18px", color: item.markColor }}
@@ -956,14 +1073,17 @@ const DefectHandal = defineComponent({
                     onMouseUp={handleMouseUp}
                     onMousemove={handleMouseMove}
                   >
-                    <v-image config={{ image: imageSingle.value }}></v-image>
+                    <v-image
+                      ref={imageSingleRef}
+                      config={{ image: imageSingle.value }}
+                    ></v-image>
                     {defectSingleRecs.value?.map((item, index) => {
                       return (
                         <v-group
                           key={index}
                           config={{
                             id: item.id || "new",
-                            draggable: toolState.image === EToolImage.CHOOSE,
+                            // draggable: toolState.image === EToolImage.CHOOSE,
                           }}
                         >
                           <v-text
@@ -982,7 +1102,14 @@ const DefectHandal = defineComponent({
                               y: item.y,
                               width: item.width,
                               height: item.height,
-                              fill: "rgb(0,0,0,0)",
+                              fill:
+                                props.defectHighLight !== Number(item.id)
+                                  ? "rgb(0,0,0,0)"
+                                  : item.color,
+                              opacity:
+                                props.defectHighLight !== Number(item.id)
+                                  ? 1
+                                  : 0.5,
                               stroke: item.color,
                               strokeWidth: 1,
                               name: "rec" + index,
@@ -1008,8 +1135,11 @@ const DefectHandal = defineComponent({
                       onWheel={wheelForDoubleScale}
                       onMouseDown={handleMouseDownDouble}
                     >
-                      <v-image config={{ image: imageDouble.value }}></v-image>
-                      {defectSingleRecs.value?.map((item, index) => {
+                      <v-image
+                        ref={imageDoubleRef}
+                        config={{ image: imageDouble.value }}
+                      ></v-image>
+                      {/* {defectSingleRecs.value?.map((item, index) => {
                         return (
                           <v-group
                             key={index}
@@ -1043,10 +1173,44 @@ const DefectHandal = defineComponent({
                             />
                           </v-group>
                         );
-                      })}
+                      })} */}
                     </v-group>
                   </v-layer>
                 </v-stage>
+              </div>
+            ) : null}
+            {saveState.saveStatus ? (
+              <div
+                class="defect-handle-cont-save"
+                style={{
+                  top: `${saveState.positionY}px`,
+                  left: `${saveState.positionX}px`,
+                }}
+              >
+                <div class="defect-handle-cont-save-arrow"></div>
+                <div>{saveState.saveInfo}</div>
+              </div>
+            ) : null}
+            {selectState.selectStatus ? (
+              <div
+                class="defect-handle-cont-select"
+                style={{
+                  top: `${selectState.positionY}px`,
+                  left: `${selectState.positionX}px`,
+                }}
+              >
+                {props.defectTypeList?.map((item, index) => {
+                  return (
+                    <div
+                      key={index}
+                      style={{ color: item.markColor }}
+                      class="defect-handle-cont-select-option"
+                      onClick={changeDefectType.bind(this, item)}
+                    >
+                      {item.defectDes}
+                    </div>
+                  );
+                })}
               </div>
             ) : null}
           </div>
@@ -1060,7 +1224,11 @@ const DefectHandal = defineComponent({
                   <span class="defect-list-detail-item-label">
                     {item.label}
                   </span>
-                  <span>{item.value}</span>
+                  {item?.value?.length > 4 ? (
+                    <div>{item.value}</div>
+                  ) : (
+                    <span>{item.value}</span>
+                  )}
                 </div>
               );
             })}
