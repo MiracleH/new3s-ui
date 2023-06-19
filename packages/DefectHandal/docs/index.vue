@@ -5,6 +5,8 @@
     :defectImageInfo="defectImageInfo"
     :defectDetailList="defectDetailList"
     :defectHighLight="defectHighLight"
+    :showToolLayer="true"
+    :sysColor="'#3377FF'"
     @delete="deleteH"
     @add="addH"
     @edit="editH"
@@ -281,7 +283,7 @@ const defectImageInfo = reactive({
 });
 onMounted(() => {
   defectImageInfo.imageUrl =
-    "http://192.168.5.188:9000/pvinspection/20220920_1663668378_587.JPG";
+    "http://192.168.5.188:9000/pvinspection/DJI_20220827120742_0153_Z.JPG";
   defectImageInfo.infraredImageUrl =
     "http://192.168.5.188:9000/pvinspection/20220920_1663668380_184.JPG";
 });

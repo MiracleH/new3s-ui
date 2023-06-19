@@ -50,6 +50,8 @@ export const defectProps = () => ({
   defectInfoList: Array<IDefectInfo>,
   defectImageInfo: Object as PropType<IDefectImageInfo>,
   defectHighLight: Number,
+  showToolLayer: Boolean,
+  sysColor: String,
 });
 const DefectHandal = defineComponent({
   name: "DefectHandal",
@@ -392,21 +394,34 @@ const DefectHandal = defineComponent({
                 cItem.offsetY(15 / configSingleGroup.scaleX);
               }
               if (cItem.attrs.strokeWidth) {
-                cItem.strokeWidth(2 / configSingleGroup.scaleX);
+                cItem.strokeWidth(0.6 / configSingleGroup.scaleX);
               }
             });
           }
         });
         if (toolState.layer === EToolLayer.DOUBLE) {
-          groupDoubleRef.value.getStage().children.forEach((item: any) => {
+          // groupDoubleRef.value.getStage().children.forEach((item: any) => {
+          //   if (item.children) {
+          //     item.children.forEach((cItem: any) => {
+          //       if (cItem.attrs.fontSize) {
+          //         cItem.fontSize(15 / configDoubleGroup.scaleX);
+          //         cItem.offsetY(15 / configDoubleGroup.scaleX);
+          //       }
+          //       if (cItem.attrs.strokeWidth) {
+          //         cItem.strokeWidth(2 / configDoubleGroup.scaleX);
+          //       }
+          //     });
+          //   }
+          // });
+          groupSingleRef.value.getStage().children.forEach((item: any) => {
             if (item.children) {
               item.children.forEach((cItem: any) => {
                 if (cItem.attrs.fontSize) {
-                  cItem.fontSize(15 / configDoubleGroup.scaleX);
-                  cItem.offsetY(15 / configDoubleGroup.scaleX);
+                  cItem.fontSize(15 / configSingleGroup.scaleX);
+                  cItem.offsetY(15 / configSingleGroup.scaleX);
                 }
                 if (cItem.attrs.strokeWidth) {
-                  cItem.strokeWidth(2 / configDoubleGroup.scaleX);
+                  cItem.strokeWidth(0.3 / configSingleGroup.scaleX);
                 }
               });
             }
@@ -470,7 +485,12 @@ const DefectHandal = defineComponent({
     const updateTransformer = () => {
       const transformerNode = transformerRef.value.getStage();
       if (configTransformer.selectedNode) {
-        transformerNode.nodes([configTransformer.selectedNode]);
+        transformerNode.ignoreStroke(true);
+        transformerNode.keepRatio(true);
+        transformerNode.nodes([
+          configTransformer.selectedNode,
+          configTransformer.selectedNode.parent.children[0],
+        ]);
       } else {
         transformerNode.nodes([]);
         saveState.saveStatus = false;
@@ -498,8 +518,12 @@ const DefectHandal = defineComponent({
         configTransformer.selectedNode
       ) {
         const point = stageSingleRef.value.getNode().getPointerPosition();
-        selectState.positionX = point.x;
-        selectState.positionY = point.y;
+        selectState.positionX =
+          e.target.attrs.x * configSingleGroup.scaleX +
+          groupSingleRef.value.getStage().attrs.x;
+        selectState.positionY =
+          e.target.attrs.y * configSingleGroup.scaleX +
+          groupSingleRef.value.getStage().attrs.y;
         selectState.selectStatus = true;
       }
       if (
@@ -549,8 +573,12 @@ const DefectHandal = defineComponent({
           adaptationImages();
         } else if (configTransformer.selectedNode) {
           const point = stageSingleRef.value.getNode().getPointerPosition();
-          selectState.positionX = point.x;
-          selectState.positionY = point.y;
+          selectState.positionX =
+            e.target.attrs.x * configSingleGroup.scaleX +
+            groupSingleRef.value.getStage().attrs.x;
+          selectState.positionY =
+            e.target.attrs.y * configSingleGroup.scaleX +
+            groupSingleRef.value.getStage().attrs.y;
           selectState.selectStatus = true;
         }
       }
@@ -578,6 +606,12 @@ const DefectHandal = defineComponent({
       if (toolState.image === EToolImage.CHOOSE) {
         if (configTransformer.selectedDefectId) {
           const point = stageSingleRef.value.getNode().getPointerPosition();
+          // const group = groupSingleRef.value.getNode().attrs;
+          // defectSingleRecs.value.forEach((item) => {
+          //   if (item.id === configTransformer.selectedDefectId) {
+          //     console.log(transformerRef.value.getNode());
+          //   }
+          // });
           saveState.saveInfo = (
             <div>
               <button class="defect-handle-cont-save-btn" onClick={okHandle}>
@@ -592,8 +626,15 @@ const DefectHandal = defineComponent({
               </button>
             </div>
           );
-          saveState.positionX = point.x;
-          saveState.positionY = point.y;
+          const text = e.target.parent.children[0];
+          saveState.positionX =
+            (text.attrs.x + text.textWidth) * configSingleGroup.scaleX +
+            groupSingleRef.value.getStage().attrs.x +
+            10;
+          saveState.positionY =
+            text.attrs.y * configSingleGroup.scaleX +
+            groupSingleRef.value.getStage().attrs.y -
+            25;
           saveState.saveStatus = true;
         }
       }
@@ -620,8 +661,15 @@ const DefectHandal = defineComponent({
             </button>
           </div>
         );
-        saveState.positionX = point.x + 10;
-        saveState.positionY = point.y - 32;
+        const text = e.target.parent.children[0];
+        saveState.positionX =
+          (text.attrs.x + text.textWidth) * configSingleGroup.scaleX +
+          groupSingleRef.value.getStage().attrs.x +
+          10;
+        saveState.positionY =
+          text.attrs.y * configSingleGroup.scaleX +
+          groupSingleRef.value.getStage().attrs.y -
+          25;
         saveState.saveStatus = true;
       }
       if (e.target.attrs.id && e.target.attrs.id !== "new") {
@@ -823,13 +871,25 @@ const DefectHandal = defineComponent({
         props.defectTypeList?.find((ele) => Number(ele.keyCode) === e.keyCode)
           ?.defectId ?? defectTypeId.value;
       // keyboard for tool
-      if (e.ctrlKey && e.keyCode === 65) {
-        // add
-        toolImageHandal("HANDAL");
+      const handalImageObj: any = {
+        HANDAL: 65,
+        CHOOSE: 69,
+        DRAG: 68,
+        ZOOM: 90,
+      };
+      const handalLayerObj: any = {
+        SINGLE: 49,
+        DOUBLE: 50,
+      };
+      for (let key in handalImageObj) {
+        if (e.ctrlKey && e.keyCode === (handalImageObj[key] as number)) {
+          toolImageHandal(key as TToolImage);
+        }
       }
-      if (e.ctrlKey && e.keyCode === 69) {
-        // edit
-        toolImageHandal("CHOOSE");
+      for (let key in handalLayerObj) {
+        if (e.ctrlKey && e.keyCode === (handalLayerObj[key] as number)) {
+          toolLayerHandal(key as TToolLayer);
+        }
       }
       if (e.keyCode === 46) {
         // delete
@@ -839,22 +899,6 @@ const DefectHandal = defineComponent({
         ) {
           emit("delete", configTransformer.selectedDefectId);
         }
-      }
-      if (e.ctrlKey && e.keyCode === 68) {
-        //drag
-        toolImageHandal("DRAG");
-      }
-      if (e.ctrlKey && e.keyCode === 90) {
-        //zoom
-        toolImageHandal("ZOOM");
-      }
-      if (e.ctrlKey && e.keyCode === 49) {
-        //single
-        toolLayerHandal("SINGLE");
-      }
-      if (e.ctrlKey && e.keyCode === 50) {
-        //double
-        toolLayerHandal("DOUBLE");
       }
     };
 
@@ -936,7 +980,7 @@ const DefectHandal = defineComponent({
                     fontSize: "18px",
                     color:
                       toolState.image === EToolImage.CHOOSE
-                        ? "#3377FF"
+                        ? props.sysColor
                         : "#969696",
                   }}
                 />
@@ -957,7 +1001,7 @@ const DefectHandal = defineComponent({
                     fontSize: "18px",
                     color:
                       toolState.image === EToolImage.DRAG
-                        ? "#3377FF"
+                        ? props.sysColor
                         : "#969696",
                   }}
                 />
@@ -978,56 +1022,58 @@ const DefectHandal = defineComponent({
                     fontSize: "18px",
                     color:
                       toolState.image === EToolImage.ZOOM
-                        ? "#3377FF"
+                        ? props.sysColor
                         : "#969696",
                   }}
                 />
               </div>
             </div>
-            <div class="defect-tool-common defect-tool-layer">
-              <div
-                class="defect-tool-btn"
-                onClick={toolLayerHandal.bind(this, "SINGLE")}
-                onMouseenter={(e) => {
-                  showLayerTips(e, "SINGLE");
-                }}
-                onMouseleave={() => {
-                  tipState.tipStatus = false;
-                }}
-              >
-                <font-awesome-icon
-                  icon={["fas", "square"]}
-                  style={{
-                    fontSize: "18px",
-                    color:
-                      toolState.layer === EToolLayer.SINGLE
-                        ? "#3377FF"
-                        : "#969696",
+            {props.showToolLayer ? (
+              <div class="defect-tool-common defect-tool-layer">
+                <div
+                  class="defect-tool-btn"
+                  onClick={toolLayerHandal.bind(this, "SINGLE")}
+                  onMouseenter={(e) => {
+                    showLayerTips(e, "SINGLE");
                   }}
-                />
-              </div>
-              <div
-                class="defect-tool-btn"
-                onClick={toolLayerHandal.bind(this, "DOUBLE")}
-                onMouseenter={(e) => {
-                  showLayerTips(e, "DOUBLE");
-                }}
-                onMouseleave={() => {
-                  tipState.tipStatus = false;
-                }}
-              >
-                <font-awesome-icon
-                  icon={["fas", "pause"]}
-                  style={{
-                    fontSize: "20px",
-                    color:
-                      toolState.layer === EToolLayer.DOUBLE
-                        ? "#3377FF"
-                        : "#969696",
+                  onMouseleave={() => {
+                    tipState.tipStatus = false;
                   }}
-                />
+                >
+                  <font-awesome-icon
+                    icon={["fas", "square"]}
+                    style={{
+                      fontSize: "18px",
+                      color:
+                        toolState.layer === EToolLayer.SINGLE
+                          ? props.sysColor
+                          : "#969696",
+                    }}
+                  />
+                </div>
+                <div
+                  class="defect-tool-btn"
+                  onClick={toolLayerHandal.bind(this, "DOUBLE")}
+                  onMouseenter={(e) => {
+                    showLayerTips(e, "DOUBLE");
+                  }}
+                  onMouseleave={() => {
+                    tipState.tipStatus = false;
+                  }}
+                >
+                  <font-awesome-icon
+                    icon={["fas", "pause"]}
+                    style={{
+                      fontSize: "20px",
+                      color:
+                        toolState.layer === EToolLayer.DOUBLE
+                          ? props.sysColor
+                          : "#969696",
+                    }}
+                  />
+                </div>
               </div>
-            </div>
+            ) : null}
           </div>
         ) : null}
         <div
@@ -1040,7 +1086,7 @@ const DefectHandal = defineComponent({
                 icon={["fas", "list-ul"]}
                 style={{
                   fontSize: "18px",
-                  color: handalState.typeStates ? "#3377FF" : "#969696",
+                  color: handalState.typeStates ? props.sysColor : "#969696",
                 }}
               />
             </div>
@@ -1049,7 +1095,7 @@ const DefectHandal = defineComponent({
                 icon={["fas", "screwdriver-wrench"]}
                 style={{
                   fontSize: "18px",
-                  color: handalState.toolStatus ? "#3377FF" : "#969696",
+                  color: handalState.toolStatus ? props.sysColor : "#969696",
                 }}
               />
             </div>
@@ -1083,7 +1129,7 @@ const DefectHandal = defineComponent({
                           key={index}
                           config={{
                             id: item.id || "new",
-                            // draggable: toolState.image === EToolImage.CHOOSE,
+                            draggable: toolState.image === EToolImage.CHOOSE,
                           }}
                         >
                           <v-text
@@ -1094,6 +1140,7 @@ const DefectHandal = defineComponent({
                               align: "center",
                               text: item.name,
                               fontSize: 12,
+                              strokeScaleEnabled: false,
                             }}
                           />
                           <v-rect
@@ -1112,6 +1159,7 @@ const DefectHandal = defineComponent({
                                   : 0.5,
                               stroke: item.color,
                               strokeWidth: 1,
+                              strokeScaleEnabled: false,
                               name: "rec" + index,
                               id: item.id || "new",
                             }}
