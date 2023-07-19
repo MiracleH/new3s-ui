@@ -7,6 +7,7 @@
     :defectHighLight="defectHighLight"
     :showToolLayer="true"
     :sysColor="'#3377FF'"
+    :defectListStyle="{ detailHeight: '400px', infoHeight: '370px' }"
     @delete="deleteH"
     @add="addH"
     @edit="editH"

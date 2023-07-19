@@ -1,7 +1,7 @@
 {
   "name": "new3s-ui",
   "private": false,
-  "version": "0.3.1",
+  "version": "0.3.3",
   "main": "dist/new-3s.es.js",
   "scripts": {
     "dev": "vite",

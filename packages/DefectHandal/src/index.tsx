@@ -44,6 +44,11 @@ export interface IDefectImageInfo {
   infraredImageUrl: string;
 }
 
+export interface IDefectListStyle {
+  detailHeight: string;
+  infoHeight: string;
+}
+
 export const defectProps = () => ({
   defectTypeList: Array<IDefectType>,
   defectDetailList: Array<IDefectDetail>,
@@ -52,6 +57,7 @@ export const defectProps = () => ({
   defectHighLight: Number,
   showToolLayer: Boolean,
   sysColor: String,
+  defectListStyle: Object as PropType<IDefectListStyle>,
 });
 const DefectHandal = defineComponent({
   name: "DefectHandal",
@@ -271,8 +277,8 @@ const DefectHandal = defineComponent({
     }
 
     const handalState = reactive({
-      toolStatus: false,
-      typeStates: false,
+      toolStatus: true,
+      typeStates: true,
     });
 
     const tipState = reactive<{
@@ -1265,7 +1271,10 @@ const DefectHandal = defineComponent({
         </div>
         <div class="defect-list common-border">
           <div class="defect-title">当前识别缺陷列表栏</div>
-          <div class="defect-list-detail">
+          <div
+            class="defect-list-detail"
+            style={{ height: props.defectListStyle?.detailHeight }}
+          >
             {props.defectDetailList?.map((item) => {
               return (
                 <div class="defect-list-detail-item">
@@ -1281,7 +1290,10 @@ const DefectHandal = defineComponent({
               );
             })}
           </div>
-          <div class="defect-list-info">
+          <div
+            class="defect-list-info"
+            style={{ height: props.defectListStyle?.infoHeight }}
+          >
             {defectInfoRenderList.value?.map((item) => {
               return (
                 <div class="defect-list-info-item">
