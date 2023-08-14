@@ -1272,25 +1272,6 @@ const DefectHandal = defineComponent({
         <div class="defect-list common-border">
           <div class="defect-title">当前识别缺陷列表栏</div>
           <div
-            class="defect-list-detail"
-            style={{ height: props.defectListStyle?.detailHeight }}
-          >
-            {props.defectDetailList?.map((item) => {
-              return (
-                <div class="defect-list-detail-item">
-                  <span class="defect-list-detail-item-label">
-                    {item.label}
-                  </span>
-                  {item?.value?.length > 4 ? (
-                    <div>{item.value}</div>
-                  ) : (
-                    <span>{item.value}</span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          <div
             class="defect-list-info"
             style={{ height: props.defectListStyle?.infoHeight }}
           >
@@ -1335,6 +1316,25 @@ const DefectHandal = defineComponent({
                   <div class="defect-list-info-item-type">
                     {item.defectType}-{item.defectDes}
                   </div>
+                </div>
+              );
+            })}
+          </div>
+          <div
+            class="defect-list-detail"
+            style={{ height: props.defectListStyle?.detailHeight }}
+          >
+            {props.defectDetailList?.map((item) => {
+              return (
+                <div class="defect-list-detail-item">
+                  <span class="defect-list-detail-item-label">
+                    {item.label}
+                  </span>
+                  {item?.value?.length > 4 ? (
+                    <div>{item.value}</div>
+                  ) : (
+                    <span>{item.value}</span>
+                  )}
                 </div>
               );
             })}
